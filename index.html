@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love, Secrets & Desire</title>
+</head>
+
+<body>
+  <h1>Love, Secrets & Desire</h1>
+  <p>Question Cards</p>
+
+  <div id="question">
+    Your first question will appear here.
+  </div>
+
+  <button onclick="nextQuestion()">Next Question</button>
+
+  <script>
+    const questions = [
+      "What is one secret you've never told your partner?",
+      "What makes you feel truly desired?",
+      "Is there someone from your past you still think about?",
+      "What is one thing you would never admit to your partner?",
+      "Could you forgive an affair if you still loved the person?"
+    ];
+
+    let current = 0;
+
+    function nextQuestion() {
+      current = (current + 1) % questions.length;
+      document.getElementById("question").textContent = questions[current];
+    }
+  </script>
+</body>
+</html>
