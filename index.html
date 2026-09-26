@@ -1,35 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love, Secrets & Desire</title>
+  <title>Love Secrets & Desire</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e8f7f5;
+      color: #333;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: #176b67;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 35px;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #question {
+      font-size: 22px;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    button {
+      background: #176b67;
+      color: white;
+      border: none;
+      padding: 14px 25px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Love, Secrets & Desire</h1>
-  <p>Question Cards</p>
 
-  <div id="question">
-    Your first question will appear here.
+  <div class="container">
+    <h1>Love Secrets & Desire</h1>
+    <p class="subtitle">Questions for couples, lovers and the curious.</p>
+
+    <div class="card">
+      <div id="question">Loading your question...</div>
+      <button onclick="nextQuestion()">Next Question</button>
+    </div>
   </div>
 
-  <button onclick="nextQuestion()">Next Question</button>
-
   <script>
-    const questions = [
-      "What is one secret you've never told your partner?",
-      "What makes you feel truly desired?",
-      "Is there someone from your past you still think about?",
-      "What is one thing you would never admit to your partner?",
-      "Could you forgive an affair if you still loved the person?"
-    ];
+    const SUPABASE_URL = "https://omxbwixylvtxerazrhgn.supabase.co/rest/v1/";
+    const SUPABASE_KEY = "sb_publishable_I8UQSRhzqY_1a5DJXW1-mw_RLbxOxqj";
 
-    let current = 0;
+    const supabaseClient = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    let questions = [];
+    let currentIndex = 0;
+
+    async function loadQuestions() {
+      const { data, error } = await supabaseClient
+        .from("cards")
+        .select("question");
+
+      if (error) {
+        document.getElementById("question").textContent =
+          "We couldn't load the questions yet.";
+        return;
+      }
+
+      questions = data || [];
+
+      if (questions.length > 0) {
+        document.getElementById("question").textContent =
+          questions[0].question;
+      } else {
+        document.getElementById("question").textContent =
+          "No questions available yet.";
+      }
+    }
 
     function nextQuestion() {
-      current = (current + 1) % questions.length;
-      document.getElementById("question").textContent = questions[current];
+      if (questions.length === 0) return;
+
+      currentIndex = (currentIndex + 1) % questions.length;
+
+      document.getElementById("question").textContent =
+        questions[currentIndex].question;
     }
+
+    loadQuestions();
   </script>
+
 </body>
 </html>
