@@ -3,10 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Love, Secrets & Desire</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 * {
@@ -16,94 +13,122 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: Georgia, "Times New Roman", serif;
-  background: linear-gradient(135deg, #24151d, #4a2635, #1c1117);
-  color: #fff;
+  font-family: Georgia, serif;
+  background: #24151b;
+  color: #f8eee7;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
 }
 
 .container {
   width: 100%;
-  max-width: 520px;
+  max-width: 650px;
+  padding: 30px 20px;
   text-align: center;
 }
 
-.logo {
-  font-size: 14px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: #d8b5a6;
-  margin-bottom: 18px;
-}
-
 h1 {
-  margin: 0;
-  font-size: 38px;
-  font-weight: normal;
+  font-size: 42px;
+  margin-bottom: 8px;
   letter-spacing: 1px;
 }
 
 .subtitle {
-  color: #d8c8cc;
+  color: #d8b9ad;
+  margin-bottom: 30px;
   font-family: Arial, sans-serif;
-  font-size: 15px;
-  margin: 12px 0 28px;
 }
 
-.card {
-  background: linear-gradient(145deg, #fffaf7, #f4e9e5);
-  color: #35242a;
-  border-radius: 24px;
-  min-height: 330px;
-  padding: 45px 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.card-label {
-  font-family: Arial, sans-serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #9b6879;
+.sections {
+  display: grid;
+  gap: 12px;
   margin-bottom: 25px;
 }
 
-#question {
-  font-size: 25px;
-  line-height: 1.5;
-  max-width: 430px;
-}
-
-button {
-  margin-top: 35px;
-  padding: 15px 34px;
+.section-button {
+  background: #f4e6dc;
+  color: #351b23;
   border: none;
-  border-radius: 30px;
-  background: #6f3049;
-  color: white;
-  font-family: Arial, sans-serif;
-  font-size: 15px;
+  padding: 17px 15px;
+  border-radius: 12px;
+  font-size: 17px;
   cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  font-family: Georgia, serif;
+  transition: 0.2s;
 }
 
-button:hover {
-  background: #8a405d;
+.section-button:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
 }
 
-.footer {
-  margin-top: 25px;
+.game {
+  display: none;
+}
+
+.back {
+  background: transparent;
+  border: 1px solid #c9a79b;
+  color: #f8eee7;
+  padding: 9px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.category-title {
+  color: #d8b9ad;
+  font-size: 15px;
+  margin-bottom: 12px;
   font-family: Arial, sans-serif;
+}
+
+.card {
+  background: #f8eee7;
+  color: #321b22;
+  border-radius: 22px;
+  padding: 50px 30px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 3px;
   font-size: 12px;
-  color: #bfaeb3;
+  color: #9b6b5d;
+  margin-bottom: 25px;
+  font-family: Arial, sans-serif;
+}
+
+.question {
+  font-size: 27px;
+  line-height: 1.4;
+}
+
+.next {
+  margin-top: 25px;
+  background: #b88978;
+  color: white;
+  border: none;
+  padding: 15px 28px;
+  border-radius: 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.next:hover {
+  background: #9f6f60;
+}
+
+.error {
+  color: #e7aaa0;
+  font-family: Arial, sans-serif;
+  margin-top: 20px;
 }
 </style>
 </head>
@@ -112,88 +137,146 @@ button:hover {
 
 <div class="container">
 
-  <div class="logo">100 Questions</div>
-
-  <h1>Love, Secrets & Desire</h1>
-
-  <p class="subtitle">
-    Questions for couples, lovers and the curious.
-  </p>
-
-  <div class="card">
-
-    <div class="card-label">Question</div>
-
-    <div id="question">
-      Loading your question...
+  <div id="home">
+    <h1>Love, Secrets & Desire</h1>
+    <div class="subtitle">
+      Questions for couples, lovers and the curious.
     </div>
 
-    <button onclick="nextQuestion()">
+    <div class="sections">
+      <button class="section-button" onclick="startGame('Attraction & Connection')">
+        Attraction & Connection
+      </button>
+
+      <button class="section-button" onclick="startGame('Love, Trust & Secrets')">
+        Love, Trust & Secrets
+      </button>
+
+      <button class="section-button" onclick="startGame('Desire & Intimacy')">
+        Desire & Intimacy
+      </button>
+
+      <button class="section-button" onclick="startGame('Past Loves & Temptation')">
+        Past Loves & Temptation
+      </button>
+
+      <button class="section-button" onclick="startGame('Love, Choices & Confessions')">
+        Love, Choices & Confessions
+      </button>
+    </div>
+
+    <div id="homeError" class="error"></div>
+  </div>
+
+  <div id="game" class="game">
+
+    <button class="back" onclick="goHome()">← Back to sections</button>
+
+    <div id="categoryTitle" class="category-title"></div>
+
+    <div class="card">
+      <div class="label">Question</div>
+      <div id="question" class="question">
+        Loading...
+      </div>
+    </div>
+
+    <button class="next" onclick="nextQuestion()">
       Next Question
     </button>
 
-  </div>
-
-  <div class="footer">
-    How honest are you willing to be?
   </div>
 
 </div>
 
 <script>
 
-const SUPABASE_URL =
-"https://omxbwixylvtxerazrhgn.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://omxbwixylvtxerazrhgn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_I8UQSRhzqY_1a5DJXW1-mw_RLbxOxqj";
 
-const SUPABASE_KEY =
-"sb_publishable_I8UQSRhzqY_1a5DJXW1-mw_RLbxOxqj";
-
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-let questions = [];
+let allQuestions = [];
+let currentQuestions = [];
 let currentIndex = 0;
+let currentSection = "";
 
 async function loadQuestions() {
 
-  const { data, error } = await supabaseClient
-    .from("cards")
-    .select("question");
+  try {
 
-  if (error) {
+    const response = await fetch(
+      SUPABASE_URL +
+      "/rest/v1/cards?select=question,section&order=created_at.asc",
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
 
-    document.getElementById("question").textContent =
+    if (!response.ok) {
+      throw new Error("Could not load questions");
+    }
+
+    allQuestions = await response.json();
+
+  } catch (error) {
+
+    document.getElementById("homeError").textContent =
       "We couldn't load the questions yet.";
-
-    return;
-  }
-
-  questions = data || [];
-
-  if (questions.length > 0) {
-
-    document.getElementById("question").textContent =
-      questions[0].question;
-
-  } else {
-
-    document.getElementById("question").textContent =
-      "No questions available yet.";
 
   }
 }
 
-function nextQuestion() {
+function startGame(section) {
 
-  if (questions.length === 0) return;
+  currentSection = section;
 
-  currentIndex =
-    (currentIndex + 1) % questions.length;
+  currentQuestions = allQuestions.filter(
+    item => item.section === section
+  );
+
+  currentIndex = 0;
+
+  document.getElementById("home").style.display = "none";
+  document.getElementById("game").style.display = "block";
+
+  document.getElementById("categoryTitle").textContent = section;
+
+  showQuestion();
+}
+
+function showQuestion() {
+
+  if (currentQuestions.length === 0) {
+
+    document.getElementById("question").textContent =
+      "No questions found in this section.";
+
+    return;
+  }
 
   document.getElementById("question").textContent =
-    questions[currentIndex].question;
+    currentQuestions[currentIndex].question;
+}
+
+function nextQuestion() {
+
+  if (currentQuestions.length === 0) return;
+
+  currentIndex++;
+
+  if (currentIndex >= currentQuestions.length) {
+    currentIndex = 0;
+  }
+
+  showQuestion();
+}
+
+function goHome() {
+
+  document.getElementById("game").style.display = "none";
+  document.getElementById("home").style.display = "block";
 }
 
 loadQuestions();
