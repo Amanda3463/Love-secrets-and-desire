@@ -156,7 +156,7 @@
 
       const { data, error } = await client
         .from("cards")
-        .select("id, question, category")
+        .select("id, question, section")
         .order("id", { ascending: true });
 
       if (error) {
@@ -195,7 +195,7 @@
         item.question;
 
       document.getElementById("category").textContent =
-        item.category || "For Couples";
+        item.section || "For Couples";
 
       document.getElementById("number").textContent =
         "Question " + (currentQuestion + 1) +
