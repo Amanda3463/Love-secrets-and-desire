@@ -212,39 +212,58 @@
     }
 
     function showQuestion() {
-      const item = questions[currentQuestion];
-      
+  const item = questions[currentQuestion];
 
-    
+  const card = document.querySelector(".card");
+  const nextButton = document.getElementById("nextButton");
 
-      document.getElementById("question").textContent =
-        item.question;
+  card.className = "card";
 
-      document.getElementById("category").textContent =
-        item.section || "For Couples";
-const card = document.querySelector(".card");
+  const category = (item.section || "").toLowerCase();
 
-card.className = "card";
+  if (category.includes("attraction") || category.includes("connection")) {
+    card.classList.add("attraction");
+  } else if (category.includes("love") || category.includes("romance")) {
+    card.classList.add("love");
+  } else if (category.includes("communication") || category.includes("talk")) {
+    card.classList.add("communication");
+  } else if (category.includes("trust") || category.includes("emotional")) {
+    card.classList.add("trust");
+  } else if (category.includes("intimacy") || category.includes("desire") || category.includes("sexual")) {
+    card.classList.add("intimacy");
+  } else {
+    card.classList.add("deep");
+  }
 
-const category = (item.section || "").toLowerCase();
+  if (currentQuestion < 3) {
 
-if (category.includes("attraction")) {
-  card.classList.add("attraction");
-} else if (category.includes("love")) {
-  card.classList.add("love");
-} else if (category.includes("communication")) {
-  card.classList.add("communication");
-} else if (category.includes("trust")) {
-  card.classList.add("trust");
-} else if (category.includes("intimacy") || category.includes("desire")) {
-  card.classList.add("intimacy");
-} else if (category.includes("deep") || category.includes("personal")) {
-  card.classList.add("deep");
+    document.getElementById("question").textContent =
+      item.question;
+
+    document.getElementById("category").textContent =
+      item.section || "For Couples";
+
+    document.getElementById("number").textContent =
+      "Question " + (currentQuestion + 1) +
+      " of 3 free questions";
+
+    nextButton.textContent = "Next Question";
+
+  } else {
+
+    document.getElementById("question").textContent =
+      "🔒 Unlock all 100 questions";
+
+    document.getElementById("category").textContent =
+      "Love, Secrets & Desire";
+
+    document.getElementById("number").textContent =
+      "Get all 100 questions for R49";
+
+    nextButton.textContent =
+      "Unlock All 100 – R49";
+  }
 }
-      document.getElementById("number").textContent =
-        "Question " + (currentQuestion + 1) +
-        " of " + questions.length;
-    }
 
     function nextQuestion() {
 
