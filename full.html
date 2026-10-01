@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love, Secrets & Desire</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      background: #d9f4f2;
+      color: #234344;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .title img {
+      width: 50%;
+      height: 80px;
+      display: block;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+
+    .subtitle {
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      margin-bottom: 25px;
+      color: #547577;
+    }
+
+    .card {
+      background: #fffdf9;
+      border-radius: 28px;
+      padding: 42px 30px;
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(40,90,90,.15);
+      border: 1px solid #b8dfdc;
+    }
+
+    .category {
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 14px;
+      color: #3c8b8d;
+      margin-bottom: 25px;
+    }
+
+    .question {
+      font-size: 25px;
+      line-height: 1.5;
+      color: #293f40;
+    }
+
+    .number {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      color: #799394;
+      margin-top: 25px;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 30px;
+      background: #4aa7a5;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .card.attraction { background:#f9e4e7; }
+    .card.love { background:#f4dce3; }
+    .card.communication { background:#e2f3f2; }
+    .card.trust { background:#e5f0e4; }
+    .card.intimacy { background:#f9e5d5; }
+    .card.deep { background:#eee5f5; }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="title">
+    <img src="Love_image.png" alt="Love, Secrets & Desire">
+  </div>
+
+  <div class="subtitle">
+    Questions for couples who want to talk, laugh and discover more.
+  </div>
+
+  <div class="card">
+
+    <div id="category" class="category"></div>
+
+    <div id="question" class="question">
+      Loading your questions...
+    </div>
+
+    <div id="number" class="number"></div>
+
+  </div>
+
+  <button onclick="nextQuestion()">Next Question</button>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://foyztoruzldypszmhwpu.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_pIHkIV6Kb4X49MmqgNp-bA_qQ9q1xoG";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let questions = [];
+let currentQuestion = 0;
+
+async function loadQuestions() {
+
+  const { data, error } = await client
+    .from("cards")
+    .select("id, question, section")
+    .order("id", { ascending: true });
+
+  if (error) {
+    document.getElementById("question").textContent =
+      "We couldn't load the questions yet.";
+    return;
+  }
+
+  questions = data || [];
+
+  if (questions.length === 0) {
+    document.getElementById("question").textContent =
+      "No questions have been added yet.";
+    return;
+  }
+
+  showQuestion();
+}
+
+function showQuestion() {
+
+  const item = questions[currentQuestion];
+  const card = document.querySelector(".card");
+
+  card.className = "card";
+
+  const category = (item.section || "").toLowerCase();
+
+  if (category.includes("attraction") || category.includes("connection"))
+    card.classList.add("attraction");
+  else if (category.includes("love") || category.includes("romance"))
+    card.classList.add("love");
+  else if (category.includes("communication") || category.includes("talk"))
+    card.classList.add("communication");
+  else if (category.includes("trust") || category.includes("emotional"))
+    card.classList.add("trust");
+  else if (category.includes("intimacy") || category.includes("desire") || category.includes("sexual"))
+    card.classList.add("intimacy");
+  else
+    card.classList.add("deep");
+
+  document.getElementById("question").textContent =
+    item.question;
+
+  document.getElementById("category").textContent =
+    item.section || "For Couples";
+
+  document.getElementById("number").textContent =
+    "Question " + (currentQuestion + 1) +
+    " of " + questions.length;
+}
+
+function nextQuestion() {
+
+  currentQuestion++;
+
+  if (currentQuestion >= questions.length) {
+    currentQuestion = 0;
+  }
+
+  showQuestion();
+}
+
+loadQuestions();
+
+</script>
+
+</body>
+</html>
