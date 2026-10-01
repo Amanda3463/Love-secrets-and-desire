@@ -222,7 +222,25 @@
 
       document.getElementById("category").textContent =
         item.section || "For Couples";
+const card = document.querySelector(".card");
 
+card.className = "card";
+
+const category = (item.section || "").toLowerCase();
+
+if (category.includes("attraction")) {
+  card.classList.add("attraction");
+} else if (category.includes("love")) {
+  card.classList.add("love");
+} else if (category.includes("communication")) {
+  card.classList.add("communication");
+} else if (category.includes("trust")) {
+  card.classList.add("trust");
+} else if (category.includes("intimacy") || category.includes("desire")) {
+  card.classList.add("intimacy");
+} else if (category.includes("deep") || category.includes("personal")) {
+  card.classList.add("deep");
+}
       document.getElementById("number").textContent =
         "Question " + (currentQuestion + 1) +
         " of " + questions.length;
