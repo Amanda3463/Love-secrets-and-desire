@@ -150,7 +150,7 @@
 
     </div>
 
-    <button id="nextButton" onclick="window.location.href='https://payhip.com/b/pBimK'">
+    <button id="nextButton" onclick="nextQuestion()">
       Next Question
     </button>
 
@@ -265,21 +265,20 @@
   }
 }
 
-    function nextQuestion() {
+     function nextQuestion() {
 
-      if (questions.length === 0) {
-        return;
-      }
+  if (questions.length === 0) {
+    return;
+  }
 
-      currentQuestion++;
+  if (currentQuestion >= 2) {
+    window.location.href = "https://payhip.com/b/pBimK";
+    return;
+  }
 
-      if (currentQuestion >= questions.length) {
-        currentQuestion = 0;
-      }
-
-      showQuestion();
-    }
-
+  currentQuestion++;
+  showQuestion();
+}
     loadQuestions();
 
   </script>
