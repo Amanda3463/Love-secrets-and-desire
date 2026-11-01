@@ -1,5 +1,6 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +27,7 @@
       width: 100%;
       max-width: 520px;
       text-align: center;
+      margin: auto;
     }
 
     .title img {
@@ -77,8 +79,8 @@
       margin-top: 25px;
     }
 
-    button {
-      margin-top: 25px;
+    button, .buy-button {
+      margin-top: 18px;
       width: 100%;
       padding: 17px;
       border: none;
@@ -88,6 +90,13 @@
       font-size: 17px;
       font-weight: bold;
       cursor: pointer;
+      display: block;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+    }
+
+    .buy-button {
+      background: #287f7d;
     }
 
     .card.attraction { background:#f9e4e7; }
@@ -96,6 +105,51 @@
     .card.trust { background:#e5f0e4; }
     .card.intimacy { background:#f9e5d5; }
     .card.deep { background:#eee5f5; }
+
+    .access-panel {
+      display: none;
+      margin-top: 22px;
+      background: #fffdf9;
+      border: 1px solid #b8dfdc;
+      border-radius: 22px;
+      padding: 25px;
+      box-shadow: 0 8px 24px rgba(40,90,90,.12);
+    }
+
+    .access-panel h2 {
+      font-size: 23px;
+      margin-top: 0;
+    }
+
+    .access-panel p {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #547577;
+    }
+
+    .access-panel input {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 1px solid #b8dfdc;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: #799394;
+      font-family: Arial, sans-serif;
+      margin-top: 15px;
+    }
+
+    #status {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-top: 15px;
+      color: #287f7d;
+    }
   </style>
 </head>
 
@@ -111,8 +165,7 @@
     Questions for couples who want to talk, laugh and discover more.
   </div>
 
-  <div class="card">
-
+  <div class="card" id="gameCard">
     <div id="category" class="category"></div>
 
     <div id="question" class="question">
@@ -120,10 +173,66 @@
     </div>
 
     <div id="number" class="number"></div>
-
   </div>
 
-  <button onclick="nextQuestion()">Next Question</button>
+  <button id="nextButton" onclick="nextQuestion()">
+    Next Question
+  </button>
+
+  <div class="access-panel" id="accessPanel">
+
+    <h2>Ready for more?</h2>
+
+    <p>
+      You've enjoyed your first 3 free questions!
+      Unlock all 100 questions for just $3.
+    </p>
+
+    <a
+      class="buy-button"
+      href="https://payhip.com/b/pBimK"
+      target="_blank"
+      rel="noopener noreferrer">
+      BUY NOW – $3
+    </a>
+
+    <p>
+      Already purchased? Create an account or sign in
+      using the same email address you used at checkout.
+    </p>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Your email address"
+      autocomplete="email">
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Create a password (at least 6 characters)"
+      autocomplete="new-password">
+
+    <button onclick="createAccount()">
+      Create Account
+    </button>
+
+    <button onclick="signIn()">
+      Sign In
+    </button>
+
+    <button onclick="unlockPurchase()">
+      I've Paid – Unlock My Questions
+    </button>
+
+    <div id="status"></div>
+
+    <div class="small-note">
+      Your purchase must be recorded by Payhip before
+      the remaining questions can be unlocked.
+    </div>
+
+  </div>
 
 </div>
 
@@ -140,15 +249,24 @@ const client = window.supabase.createClient(
   SUPABASE_KEY
 );
 
+const PAYHIP_LINK = "https://payhip.com/b/pBimK";
+
 let questions = [];
+let freeQuestions = [];
 let currentQuestion = 0;
+let isUnlocked = false;
+
+function showStatus(message) {
+  document.getElementById("status").textContent = message;
+}
 
 async function loadQuestions() {
 
   const { data, error } = await client
     .from("cards")
     .select("id, question, section")
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(3);
 
   if (error) {
     document.getElementById("question").textContent =
@@ -156,7 +274,8 @@ async function loadQuestions() {
     return;
   }
 
-  questions = data || [];
+  freeQuestions = data || [];
+  questions = [...freeQuestions];
 
   if (questions.length === 0) {
     document.getElementById("question").textContent =
@@ -165,13 +284,22 @@ async function loadQuestions() {
   }
 
   showQuestion();
+
+  // If a customer is already signed in, check their purchase.
+  const { data: sessionData } = await client.auth.getSession();
+
+  if (sessionData.session) {
+    await unlockPurchase(true);
+  }
 }
 
 function showQuestion() {
 
   const item = questions[currentQuestion];
-  const card = document.querySelector(".card");
 
+  if (!item) return;
+
+  const card = document.querySelector(".card");
   card.className = "card";
 
   const category = (item.section || "").toLowerCase();
@@ -197,10 +325,22 @@ function showQuestion() {
 
   document.getElementById("number").textContent =
     "Question " + (currentQuestion + 1) +
-    " of " + questions.length;
+    " of " + (isUnlocked ? questions.length : "100");
 }
 
 function nextQuestion() {
+
+  if (!isUnlocked && currentQuestion >= 2) {
+    document.getElementById("accessPanel").style.display = "block";
+    document.getElementById("nextButton").style.display = "none";
+
+    document.getElementById("accessPanel").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return;
+  }
 
   currentQuestion++;
 
@@ -209,6 +349,121 @@ function nextQuestion() {
   }
 
   showQuestion();
+}
+
+function getCredentials() {
+  return {
+    email: document.getElementById("email").value.trim().toLowerCase(),
+    password: document.getElementById("password").value
+  };
+}
+
+async function createAccount() {
+
+  const { email, password } = getCredentials();
+
+  if (!email || password.length < 6) {
+    showStatus("Enter your email and a password of at least 6 characters.");
+    return;
+  }
+
+  showStatus("Creating your account...");
+
+  const { data, error } = await client.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: window.location.href
+    }
+  });
+
+  if (error) {
+    showStatus(error.message);
+    return;
+  }
+
+  if (data.session) {
+    showStatus("Account created. Checking your purchase...");
+    await unlockPurchase();
+  } else {
+    showStatus("Account created! Please check your email and click the verification link. Then return here and sign in.");
+  }
+}
+
+async function signIn() {
+
+  const { email, password } = getCredentials();
+
+  if (!email || !password) {
+    showStatus("Please enter your email and password.");
+    return;
+  }
+
+  showStatus("Signing in...");
+
+  const { error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    showStatus(error.message);
+    return;
+  }
+
+  showStatus("Signed in. Checking your purchase...");
+  await unlockPurchase();
+}
+
+async function unlockPurchase(silent = false) {
+
+  const { data: sessionData } = await client.auth.getSession();
+
+  if (!sessionData.session) {
+    if (!silent) {
+      showStatus("Please sign in with your verified email first.");
+    }
+    return;
+  }
+
+  if (!silent) {
+    showStatus("Checking your purchase...");
+  }
+
+  const { data, error } = await client.functions.invoke(
+    "verify-purchase",
+    { body: {} }
+  );
+
+  if (error || !data || !data.unlocked || !Array.isArray(data.questions)) {
+    if (!silent) {
+      showStatus(
+        "We couldn't find a confirmed purchase for this email yet. Check that you used the same email at Payhip, and try again shortly."
+      );
+    }
+    return;
+  }
+
+  questions = [...freeQuestions, ...data.questions];
+  isUnlocked = true;
+  currentQuestion = 3;
+
+  if (questions.length <= 3) {
+    showStatus("Your purchase was checked, but the paid questions were not returned. Please contact support.");
+    return;
+  }
+
+  document.getElementById("accessPanel").style.display = "none";
+  document.getElementById("nextButton").style.display = "block";
+
+  showQuestion();
+
+  showStatus("Your purchase is confirmed! All 100 questions are unlocked.");
+
+  document.getElementById("gameCard").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
 }
 
 loadQuestions();
