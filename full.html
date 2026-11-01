@@ -2,6 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  ALTER POLICY "Allow public to read cards"
+ON public.cards
+TO anon, authenticated
+USING (id <= 3);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Love, Secrets & Desire</title>
